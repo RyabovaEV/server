@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"server/configs"
 	"server/internal/hello"
 )
 
 func main() {
+	conf := configs.LoadConfig()
 	router := http.NewServeMux()
 	hello.NewHelloHandler(router)
 
