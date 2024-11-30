@@ -2,9 +2,11 @@
 package auth
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"server/configs"
+	"server/pcg/res"
 )
 
 // AuthHendlerDeps связь с конфигурацией
@@ -29,8 +31,25 @@ func NewAuthHendler(router *http.ServeMux, deps AuthHendlerDeps) {
 // Login функция вызываемая при логировании
 func (handler *AuthHendler) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println(handler.Config.Auth.Secret)
-		fmt.Println("Login")
+		var payload LoginRecuest
+		err := json.NewDecoder(req.Body).Decode(&payload)
+		if err != nil {
+			res.Json(w, err.Error(), 402)
+			return
+		}
+		if payload.Email == "" {
+			res.Json(w, "Email required", 402)
+			return
+		}
+		if payload.Password == "" {
+			res.Json(w, "Password required", 402)
+			return
+		}
+		fmt.Println((payload))
+		data := LoginResponse{
+			Token: "123",
+		}
+		res.Json(w, data, 200)
 	}
 }
 
