@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/mail"
 	"server/configs"
 	"server/pcg/res"
 )
@@ -41,8 +42,22 @@ func (handler *AuthHendler) Login() http.HandlerFunc {
 			res.Json(w, "Email required", 402)
 			return
 		}
-		if payload.Password == "" {
-			res.Json(w, "Password required", 402)
+		// 1 вариант
+		/*reg, _ := regexp.Compile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+		if !reg.MatchString(payload.Email) {
+			res.Json(w, "Wrong email", 402)
+			return
+		}*/
+		// 2 вариант
+		/*match, _ := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, payload.Email)
+		if !match {
+			res.Json(w, "Wrong required", 402)
+			return
+		}*/
+		// 3 вариант через ст библиотеку Go
+		_, err = mail.ParseAddress(payload.Email)
+		if err != nil {
+			res.Json(w, "Wrong required", 402)
 			return
 		}
 		fmt.Println((payload))
