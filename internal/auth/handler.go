@@ -2,12 +2,11 @@
 package auth
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/mail"
 	"server/configs"
-	"server/pcg/res"
+	"server/pkg/req"
+	"server/pkg/res"
 )
 
 // AuthHendlerDeps связь с конфигурацией
@@ -31,36 +30,12 @@ func NewAuthHendler(router *http.ServeMux, deps AuthHendlerDeps) {
 
 // Login функция вызываемая при логировании
 func (handler *AuthHendler) Login() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		var payload LoginRecuest
-		err := json.NewDecoder(req.Body).Decode(&payload)
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[LoginRecuest](&w, r)
 		if err != nil {
-			res.Json(w, err.Error(), 402)
 			return
 		}
-		if payload.Email == "" {
-			res.Json(w, "Email required", 402)
-			return
-		}
-		// 1 вариант
-		/*reg, _ := regexp.Compile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-		if !reg.MatchString(payload.Email) {
-			res.Json(w, "Wrong email", 402)
-			return
-		}*/
-		// 2 вариант
-		/*match, _ := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, payload.Email)
-		if !match {
-			res.Json(w, "Wrong required", 402)
-			return
-		}*/
-		// 3 вариант через ст библиотеку Go
-		_, err = mail.ParseAddress(payload.Email)
-		if err != nil {
-			res.Json(w, "Wrong required", 402)
-			return
-		}
-		fmt.Println((payload))
+		fmt.Println(body)
 		data := LoginResponse{
 			Token: "123",
 		}
@@ -70,7 +45,15 @@ func (handler *AuthHendler) Login() http.HandlerFunc {
 
 // Register функция вызываемая при регистрации
 func (handler *AuthHendler) Register() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println("Register")
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[RegistrRequest](&w, r)
+		if err != nil {
+			return
+		}
+		fmt.Println(*body)
+		data := RegistrResponse{
+			Token: "123",
+		}
+		res.Json(w, data, 200)
 	}
 }
