@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"server/configs"
 	"server/internal/auth"
+	"server/pkg/db"
 )
 
 func main() {
 	conf := configs.LoadConfig()
+	_ = db.NewDb(conf)
 	router := http.NewServeMux()
 	auth.NewAuthHendler(router, auth.AuthHendlerDeps{
 		Config: conf,
