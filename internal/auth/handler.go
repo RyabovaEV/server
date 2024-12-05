@@ -1,4 +1,4 @@
-// Package auth пакет с хендлером для авторизации
+// Package auth обработка HTTP запросов для работы с авторизацией
 package auth
 
 import (
