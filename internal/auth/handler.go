@@ -12,17 +12,20 @@ import (
 // AuthHendlerDeps связь с конфигурацией
 type AuthHendlerDeps struct {
 	*configs.Config
+	*Service
 }
 
 // AuthHendler структура хендлера для авторизации
 type AuthHendler struct {
 	*configs.Config
+	*Service
 }
 
 // NewAuthHendler создание нового хендлера
 func NewAuthHendler(router *http.ServeMux, deps AuthHendlerDeps) {
 	handler := &AuthHendler{
-		Config: deps.Config,
+		Config:  deps.Config,
+		Service: deps.Service,
 	}
 	router.HandleFunc("POST /auth/login", handler.Login())
 	router.HandleFunc("POST /auth/register", handler.Register())
@@ -35,7 +38,8 @@ func (handler *AuthHendler) Login() http.HandlerFunc {
 		if err != nil {
 			return
 		}
-		fmt.Println(body)
+		email, err := handler.Service.Login(body.Email, body.Password)
+		fmt.Println(email, err)
 		data := LoginResponse{
 			Token: "123",
 		}
@@ -50,10 +54,6 @@ func (handler *AuthHendler) Register() http.HandlerFunc {
 		if err != nil {
 			return
 		}
-		fmt.Println(*body)
-		data := RegistrResponse{
-			Token: "123",
-		}
-		res.Json(w, data, 200)
+		handler.Service.Register(body.Email, body.Password, body.Name)
 	}
 }

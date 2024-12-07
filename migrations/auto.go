@@ -1,8 +1,10 @@
+// Package main для добавления сущностей в БД
 package main
 
 import (
 	"os"
 	"server/internal/link"
+	"server/internal/user"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -18,5 +20,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db.AutoMigrate(&link.Link{})
+	db.AutoMigrate(&link.Link{}, &user.User{})
 }

@@ -8,8 +8,9 @@ type LoginRecuest struct {
 
 // RegistrRequest  структура запроса на регистрацию
 type RegistrRequest struct {
-	Name  string       `json:"name" validate:"required"`
-	Login LoginRecuest `json:"login"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 // LoginResponse структура ответа на запрос
