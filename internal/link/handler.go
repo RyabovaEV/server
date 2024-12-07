@@ -3,6 +3,7 @@ package link
 
 import (
 	"net/http"
+	"server/pkg/middleware"
 	"server/pkg/req"
 	"server/pkg/res"
 	"strconv"
@@ -27,7 +28,7 @@ func NewLinkHendler(router *http.ServeMux, deps LinkHendlerDeps) {
 	}
 	router.HandleFunc("GET /{hash}", handler.GoTo())
 	router.HandleFunc("POST /link", handler.Create())
-	router.HandleFunc("PATCH /link/{id}", handler.Update())
+	router.Handle("PATCH /link/{id}", middleware.IsAuthed(handler.Update()))
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
 }
 
@@ -72,7 +73,7 @@ func (handler *LinkHendler) Create() http.HandlerFunc {
 
 }
 
-// UpdateLink изменение ссылки
+// Update изменение ссылки
 func (handler *LinkHendler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// парсим боди
