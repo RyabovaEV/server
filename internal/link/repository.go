@@ -66,3 +66,26 @@ func (repo *LinkRepository) GetByID(id uint) (*Link, error) {
 	}
 	return &link, nil
 }
+
+// Count сколько не удаленных ссылок
+func (repo *LinkRepository) Count() int64 {
+	var count int64
+	repo.Database.
+		Table("links").
+		Where("deleted_at is null").
+		Count(&count)
+	return count
+}
+
+// GetAll получение списка ссылок из БД
+func (repo *LinkRepository) GetAll(limit, offset int) []Link {
+	var links []Link
+	repo.Database.
+		Table("links").
+		Where("deleted_at is null").
+		Order("id asc").
+		Limit(limit).
+		Offset(offset).
+		Scan(&links)
+	return links
+}

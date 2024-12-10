@@ -33,6 +33,7 @@ func NewLinkHendler(router *http.ServeMux, deps LinkHendlerDeps) {
 	router.HandleFunc("POST /link", handler.Create())
 	router.Handle("PATCH /link/{id}", middleware.IsAuthed(handler.Update(), deps.Config))
 	router.HandleFunc("DELETE /link/{id}", handler.Delete())
+	router.Handle("GET /link", middleware.IsAuthed(handler.GetAll(), deps.Config))
 }
 
 // GoTo получение ссылки
@@ -129,5 +130,27 @@ func (handler *LinkHendler) Delete() http.HandlerFunc {
 			return
 		}
 		res.Json(w, nil, 200)
+	}
+}
+
+// GetAll получить все ссылки
+func (handler *LinkHendler) GetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+		if err != nil {
+			http.Error(w, "Invalid limit", http.StatusBadGateway)
+			return
+		}
+		offset, err := strconv.Atoi(r.URL.Query().Get("limit"))
+		if err != nil {
+			http.Error(w, "Invalid offset", http.StatusBadGateway)
+			return
+		}
+		links := handler.LinkRepository.GetAll(limit, offset)
+		count := handler.LinkRepository.Count()
+		res.Json(w, GetAllLinksResponce{
+			Links: links,
+			Count: count,
+		}, 200)
 	}
 }
